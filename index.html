@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<title>Back to Strong</title>
+<style>
+:root{--bg:#f5f5f2;--card:#fff;--ink:#161616;--muted:#777;--line:#e7e7e3;--soft:#efefeb}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:#111;color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:20;box-shadow:0 2px 12px #0002}
+.top{display:flex;justify-content:space-between;align-items:center}.brand{font-size:21px;font-weight:800;letter-spacing:-.4px}.badge{font-size:11px;background:#2b2b2b;border-radius:99px;padding:6px 9px;color:#ddd}
+.subtitle{color:#aaa;font-size:12px;margin-top:3px}.switch{display:flex;gap:8px;margin-top:15px}.switch button{flex:1;border:0;border-radius:10px;padding:10px;font-weight:700;background:#2a2a2a;color:#aaa}.switch button.active{background:#fff;color:#111}
+main{max-width:680px;margin:auto;padding:14px 12px 42px}.hero{padding:4px 3px 10px}.eyebrow{font-size:11px;color:#777;text-transform:uppercase;letter-spacing:1px;font-weight:700}.hero h2{font-size:25px;margin:3px 0}.hero p{margin:0;color:#777;font-size:13px}
+.card{background:var(--card);border-radius:16px;padding:14px;margin:10px 0;box-shadow:0 1px 5px #0000000d;border:1px solid #ecece8}
+.cardhead{display:flex;justify-content:space-between;align-items:flex-start}.name{font-weight:800;font-size:17px}.target{font-size:12px;color:var(--muted);margin-top:3px}.tag{font-size:10px;background:var(--soft);padding:5px 7px;border-radius:7px;font-weight:700}
+table{width:100%;border-collapse:separate;border-spacing:0 6px;margin-top:7px}th{font-size:10px;color:#999;text-align:left;font-weight:600;padding:0 5px}td{padding:0 3px}
+input{width:100%;border:1px solid var(--line);background:#fafaf8;border-radius:9px;padding:10px;font-size:16px;outline:none}input:focus,textarea:focus{border-color:#777;background:#fff}
+.setnum{width:30px;text-align:center;color:#777;font-size:12px}.last{font-size:10px;color:#999;margin-top:7px}
+.summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}.stat{background:#111;color:#fff;border-radius:14px;padding:12px}.stat b{display:block;font-size:20px}.stat span{font-size:10px;color:#aaa}
+.barwrap{background:#e5e5e0;border-radius:99px;height:8px;overflow:hidden;margin-top:8px}.bar{height:100%;background:#111;width:0}
+.actions{display:flex;gap:8px;margin:12px 0}.actions button,.primary{border:0;border-radius:11px;padding:12px;font-weight:700;font-size:14px}.primary{background:#111;color:#fff;flex:1}.secondary{background:#e8e8e3;color:#111;flex:1}
+.timer{display:none;background:#111;color:#fff;border-radius:16px;padding:15px;margin:10px 0}.timer.show{display:block}.timerline{display:flex;align-items:center;justify-content:space-between}.time{font-size:31px;font-variant-numeric:tabular-nums;font-weight:800}.timer button{border:0;background:#fff;color:#111;border-radius:9px;padding:9px 12px;font-weight:700}
+textarea{width:100%;min-height:75px;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;resize:vertical}
+.small{font-size:11px;color:#888;text-align:center;margin:15px}.hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+<div class="top"><div><div class="brand">BACK TO STRONG</div><div class="subtitle">4-week gym comeback</div></div><div class="badge" id="weekBadge">WEEK 1</div></div>
+<div class="switch"><button id="aBtn" class="active">WORKOUT A</button><button id="bBtn">WORKOUT B</button></div>
+</header>
+<main>
+<div class="hero">
+<div class="eyebrow">Today's session</div><h2 id="title">Full Body A</h2><p>45–60 min · Keep 2–3 good reps in reserve</p>
+</div>
+<div class="summary"><div class="stat"><b id="setsDone">0</b><span>SETS LOGGED</span></div><div class="stat"><b id="exerciseDone">0/6</b><span>EXERCISES</span></div><div class="stat"><b id="sessionCount">0</b><span>SESSIONS</span></div></div>
+<div class="card"><b>Session progress</b><div class="barwrap"><div class="bar" id="progress"></div></div></div>
+<div id="exercises"></div>
+<div class="timer" id="timer"><div class="timerline"><div><div style="font-size:10px;color:#aaa">REST TIMER</div><div class="time" id="time">01:30</div></div><div><button id="timerBtn">START</button> <button id="resetTimer">RESET</button></div></div></div>
+<div class="actions"><button class="primary" id="timerShow">⏱ Rest timer</button><button class="secondary" id="finish">✓ Finish session</button></div>
+<div class="card"><b>Cardio finisher</b><div class="target">10–12 mins · treadmill, bike or cross-trainer</div><input id="cardio" placeholder="e.g. Bike · 12 min · moderate pace"></div>
+<div class="card"><b>Session notes</b><div class="target">Energy, soreness, anything worth remembering</div><textarea id="notes" placeholder="How did it feel?"></textarea></div>
+<button class="secondary" style="width:100%;border:0;border-radius:11px;padding:12px;font-weight:700" id="clear">Clear today's session</button>
+<div class="small">Everything is saved automatically on this device.</div>
+</main>
+<script>
+const A=[["Leg press",3,"10–12"],["Chest press machine",3,"10–12"],["Lat pulldown",3,"10–12"],["Dumbbell Romanian deadlift",3,"10"],["Seated cable row",2,"10–12"],["Dumbbell shoulder press",2,"10"]];
+const B=[["Goblet squat",3,"10"],["Incline dumbbell press",3,"10"],["Seated cable row",3,"10–12"],["Leg curl machine",3,"10–12"],["Lat pulldown",2,"10–12"],["Dumbbell lateral raises",2,"12–15"]];
+let wk=1,type="A",timer=90,interval=null;
+const $=id=>document.getElementById(id), key=()=>`bts-${wk}-${type}`;
+function get(){return JSON.parse(localStorage.getItem(key())||'{}')}
+function save(s){localStorage.setItem(key(),JSON.stringify(s))}
+function previous(i){for(let w=wk-1;w>=1;w--){let s=JSON.parse(localStorage.getItem(`bts-${w}-${type}`)||'{}');if(s.weights?.[i])return s.weights[i];}return ""}
+function render(){
+ $("weekBadge").textContent=`WEEK ${wk}`;$("title").textContent=`Full Body ${type}`;
+ $("aBtn").classList.toggle("active",type==="A");$("bBtn").classList.toggle("active",type==="B");
+ const ex=type==="A"?A:B,s=get(), weights=s.weights||{}, reps=s.reps||{};
+ $("exercises").innerHTML=ex.map((e,i)=>{
+  let rows="";
+  for(let j=0;j<e[1];j++){let idx=ex.slice(0,i).reduce((n,x)=>n+x[1],0)+j;
+   rows+=`<tr><td class="setnum">${j+1}</td><td><input class="w" data-i="${idx}" inputmode="decimal" placeholder="${previous(i)||'kg'}" value="${weights[idx]||''}"></td><td><input class="r" data-i="${idx}" inputmode="numeric" placeholder="${e[2]}" value="${reps[idx]||''}"></td></tr>`;
+  }
+  let p=previous(i);
+  return `<div class="card"><div class="cardhead"><div><div class="name">${i+1}. ${e[0]}</div><div class="target">${e[1]} sets × ${e[2]} reps</div></div><div class="tag">${p?'LAST: '+p+'kg':'NEW'}</div></div><table><tr><th></th><th>WEIGHT (KG)</th><th>REPS</th></tr>${rows}</table></div>`;
+ }).join("");
+ $("cardio").value=s.cardio||"";$("notes").value=s.notes||"";update();
+ document.querySelectorAll("input.w,input.r").forEach(x=>x.addEventListener("input",()=>{
+  let s=get();s.weights=s.weights||{};s.reps=s.reps||{};
+  let i=x.dataset.i;(x.classList.contains("w")?s.weights:s.reps)[i]=x.value;save(s);update();
+ }));
+}
+function update(){
+ let ex=type==="A"?A:B,s=get(),weights=s.weights||{},reps=s.reps||{},total=ex.reduce((n,e)=>n+e[1],0),logged=0,doneEx=0,offset=0;
+ ex.forEach((e,i)=>{let any=false;for(let j=0;j<e[1];j++){let k=offset+j;if(weights[k]||reps[k]){logged++;any=true}}if(any)doneEx++;offset+=e[1]});
+ $("setsDone").textContent=logged;$("exerciseDone").textContent=`${doneEx}/${ex.length}`;$("progress").style.width=(logged/total*100)+"%";
+ let sessions=0;for(let w=1;w<=4;w++)for(let t of ["A","B"]){let z=JSON.parse(localStorage.getItem(`bts-${w}-${t}`)||'{}');if(z.finished)sessions++}$("sessionCount").textContent=sessions;
+}
+function saveMeta(){let s=get();s.cardio=$("cardio").value;s.notes=$("notes").value;save(s);update()}
+$("aBtn").onclick=()=>{type="A";render()};$("bBtn").onclick=()=>{type="B";render()};
+document.addEventListener("keydown",e=>{if(e.key==="ArrowLeft"||e.key==="ArrowRight"){wk=Math.min(4,Math.max(1,wk+(e.key==="ArrowRight"?1:-1)));render()}});
+document.querySelector("header").addEventListener("click",e=>{if(e.target.id==="weekBadge"){wk=wk%4+1;render()}});
+$("cardio").addEventListener("input",saveMeta);$("notes").addEventListener("input",saveMeta);
+$("finish").onclick=()=>{let s=get();s.finished=true;s.finishedAt=new Date().toISOString();save(s);update();alert("Session saved. Nice work.");};
+$("clear").onclick=()=>{if(confirm("Clear this workout?")){localStorage.removeItem(key());render()}};
+$("timerShow").onclick=()=>{$("timer").classList.toggle("show")};
+$("timerBtn").onclick=()=>{if(interval){clearInterval(interval);interval=null;$("timerBtn").textContent="START"}else{interval=setInterval(()=>{timer--;if(timer<=0){clearInterval(interval);interval=null;timer=0;alert("Rest finished — next set.");$("timerBtn").textContent="START"}fmt()},1000);$("timerBtn").textContent="PAUSE"}};
+$("resetTimer").onclick=()=>{clearInterval(interval);interval=null;timer=90;$("timerBtn").textContent="START";fmt()};
+function fmt(){let m=String(Math.floor(timer/60)).padStart(2,"0"),s=String(timer%60).padStart(2,"0");$("time").textContent=`${m}:${s}`}
+fmt();render();
+</script>
+</body>
+</html>
